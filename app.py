@@ -1,10 +1,10 @@
 from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, request, abort
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
-from openai import OpenAI
+from linebot import WebhookHandler, LineBotApi  # 正しいインポート方法
+from linebot.exceptions import InvalidSignatureError  # 例外処理のインポート
+from linebot.models import MessageEvent, TextMessage, TextSendMessage  # メッセージ関連のインポート
+import openai
 import os
 
 app = Flask(__name__)
@@ -14,11 +14,12 @@ LINE_CHANNEL_ACCESS_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN", "あなたの
 LINE_CHANNEL_SECRET = os.getenv("LINE_CHANNEL_SECRET", "あなたのシークレット")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "あなたのOpenAIキー")
 
-line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
+# LINE SDKの初期化
+line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)  # 正しいクラスの初期化
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
-# OpenAIのクライアントを初期化（ここが新しい書き方！）
-client = OpenAI(api_key=OPENAI_API_KEY)
+# OpenAIのクライアントを初期化
+openai.api_key = OPENAI_API_KEY
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -34,22 +35,10 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    user_message = event.message.text
-
-    # ChatGPTに投げる（新しい呼び出し方）
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",  # or gpt-4
-        messages=[
-            {"role": "user", "content": user_message}
-        ]
-    )
-
-    reply = response.choices[0].message.content.strip()
-
-    # LINEに返信
+    # とりあえずChatGPTなしで動作確認する
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=reply)
+        TextSendMessage(text="こんにちは！こちらはテスト返信です。")
     )
 
 if __name__ == "__main__":
