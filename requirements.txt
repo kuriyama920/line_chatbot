@@ -2,4 +2,4 @@ gunicorn
 flask
 python-dotenv
 line-bot-sdk
-openai
+openai==0.28.0
