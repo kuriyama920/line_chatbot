@@ -37,8 +37,8 @@ def callback():
 def handle_message(event):
     user_message = event.message.text  # 受け取ったメッセージ
 
-    # ChatGPTにメッセージを投げる
-    response = openai.ChatCompletion.create(
+    # 新しいAPIの使い方
+    response = openai.completions.create(
         model="gpt-3.5-turbo",  # または "gpt-4"
         messages=[
             {"role": "user", "content": user_message}
@@ -46,7 +46,7 @@ def handle_message(event):
     )
 
     # ChatGPTからの返答を取得
-    reply = response.choices[0].message['content'].strip()
+    reply = response['choices'][0]['message']['content'].strip()
 
     # LINEに返信
     line_bot_api.reply_message(
