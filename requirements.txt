@@ -1,3 +1,5 @@
 gunicorn
-echo python-dotenv >> requirements.txt
+flask
+python-dotenv
+
 
