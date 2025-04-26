@@ -37,22 +37,34 @@ def callback():
 def handle_message(event):
     user_message = event.message.text  # 受け取ったメッセージ
 
-    # 新しいAPIの使い方
-    response = openai.completions.create(
-        model="gpt-3.5-turbo",  # または "gpt-4"
-        messages=[
-            {"role": "user", "content": user_message}
-        ]
-    )
+    try:
+        # OpenAI APIの呼び出し（修正後）
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # または "gpt-4"
+            messages=[{"role": "user", "content": user_message}]  # ユーザーからのメッセージを送信
+        )
 
-    # ChatGPTからの返答を取得
-    reply = response['choices'][0]['message']['content'].strip()
+        # ChatGPTからの返答を取得
+        reply = response['choices'][0]['message']['content'].strip()
 
-    # LINEに返信
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=reply)  # ChatGPTからの返答をLINEに送信
-    )
+        # LINEに返信
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply)  # ChatGPTからの返答をLINEに送信
+        )
+
+    except openai.OpenAIError as e:
+        print(f"OpenAI API Error: {e}")
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="申し訳ありませんが、エラーが発生しました。")
+        )
+    except Exception as e:
+        print(f"Error: {e}")
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="予期しないエラーが発生しました。")
+        )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
