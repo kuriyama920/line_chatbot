@@ -1,1 +1,3 @@
 gunicorn
+echo python-dotenv >> requirements.txt
+
