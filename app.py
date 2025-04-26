@@ -39,13 +39,14 @@ def handle_message(event):
 
     try:
         # OpenAI APIの呼び出し（修正後）
-        response = openai.ChatCompletion.create(
+        response = openai.Completion.create(
             model="gpt-3.5-turbo",  # または "gpt-4"
-            messages=[{"role": "user", "content": user_message}]  # ユーザーからのメッセージを送信
+            prompt=user_message,  # ユーザーからのメッセージを送信
+            max_tokens=150  # トークン制限を設定（必要に応じて調整）
         )
 
         # ChatGPTからの返答を取得
-        reply = response['choices'][0]['message']['content'].strip()
+        reply = response['choices'][0]['text'].strip()  # 'text' を使用
 
         # LINEに返信
         line_bot_api.reply_message(
